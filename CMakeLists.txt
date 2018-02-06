@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project(tool1cd_project)
 
 set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+set(THIRD_LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 set(BINARY_DIR "${CMAKE_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BINARY_DIR}/bin")
@@ -38,6 +39,7 @@ else()
 	set (CMAKE_CXX_EXTENSIONS OFF)
 endif()
 
+add_subdirectory(${THIRD_LIB_DIR}/zlib)
 add_subdirectory(${SOURCE_DIR}/SystemClasses)
 add_subdirectory(${SOURCE_DIR}/tool1cd)
 add_subdirectory(${SOURCE_DIR}/ctool1cd)
