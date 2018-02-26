@@ -2,13 +2,14 @@
 #define V8FILEH
 
 #include <System.Classes.hpp>
+#include <boost/filesystem.hpp>
 #include <vector>
 #include <set>
 
 #include "V8Catalog.h"
 #include "TV8FileStream.h"
 #include "../Parse_tree.h"
-#include <boost/filesystem.hpp>
+#include "V8Time.h"
 
 class V8Catalog;
 class TV8FileStream;
@@ -23,7 +24,8 @@ class V8File {
 public:
 	typedef std::set<TV8FileStream*> TV8FileStreams;
 
-	V8File(V8Catalog* _parent, const String& _name, V8File* _previous, int _start_data, int _start_header, int64_t* _time_create, int64_t* _time_modify);
+	V8File(V8Catalog *_parent, const std::string &_name, V8File *_previous, int _start_data, int _start_header,
+		   int64_t time_create, int64_t time_modify);
 
 	~V8File();
 	bool IsCatalog();
@@ -39,10 +41,10 @@ public:
 	int64_t Write(TStream* Stream, int Start, int Length);                              // дозапись/перезапись частично
 	int64_t Write(TStream* Stream);                                                     // перезапись целиком
 
-	String GetFileName();
-	String GetFullName();
+	std::string GetFileName();
+	std::string GetFullName();
 
-	void SetFileName(const String& _name);
+	void SetFileName(const std::string &_name);
 	V8Catalog* GetParentCatalog();
 	void DeleteFile();
 	V8File* GetNext();
@@ -51,10 +53,14 @@ public:
 
 	int64_t WriteAndClose(TStream* Stream, int Length = -1); // перезапись целиком и закрытие файла (для экономии памяти не используется data файла)
 
-	void GetTimeCreate(System::FILETIME* ft);
-	void GetTimeModify(System::FILETIME* ft);
-	void SetTimeCreate(System::FILETIME* ft);
-	void SetTimeModify(System::FILETIME* ft);
+	System::FILETIME get_time_create() const;
+	void time_create(const System::FILETIME &file_time);
+	void time_create(const V8Time &time);
+
+	System::FILETIME get_time_modify() const;
+	void time_modify(const System::FILETIME &file_time);
+	void time_modify(const V8Time &time);
+
 	void SaveToFile(const boost::filesystem::path &FileName);
 	void SaveToStream(TStream* stream);
 	TV8FileStream* get_stream(bool own = false);
@@ -79,9 +85,10 @@ public:
 	TV8FileStreams& streams();
 
 private:
-	String name;
-	int64_t time_create;
-	int64_t time_modify;
+	std::string name;
+
+	V8Time _time_create;
+	V8Time _time_modify;
 	TCriticalSection *Lock;
 	TStream* data;
 	V8Catalog* parent;
