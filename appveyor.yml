@@ -43,10 +43,10 @@ install:
     .\bootstrap.bat
 
     .\b2.exe toolset=%BOOST_TOOLSET% runtime-link=shared threading=multi
-    --with-system --with-filesystem --with-regex --with-program_options
+    --with-system --with-filesystem
 
     .\b2.exe toolset=%BOOST_TOOLSET% runtime-link=static threading=single
-    --with-system --with-filesystem --with-regex --with-program_options
+    --with-system --with-filesystem
 
     cd %APPVEYOR_BUILD_FOLDER%
 

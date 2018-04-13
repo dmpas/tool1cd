@@ -14,6 +14,7 @@ int CompareIC(const std::string &a, const std::string &b);
 int Compare(const std::string &a, const std::string &b);
 
 bool EndsWithIC(const std::string &str, const std::string &substr);
+bool StartsWithIC(const std::string &str, const std::string &substr);
 bool EqualIC(const std::string &a, const std::string &b);
 bool Equal(const std::string &a, const std::string &b);
 

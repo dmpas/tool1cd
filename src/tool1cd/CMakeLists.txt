@@ -58,7 +58,7 @@ endif()
 
 set_target_properties(tool1cd PROPERTIES LINKER_LANGUAGE CXX)
 
-find_package (Boost 1.53 REQUIRED COMPONENTS filesystem regex system)
+find_package (Boost 1.53 REQUIRED COMPONENTS filesystem system)
 include_directories (${Boost_INCLUDE_DIRS})
 target_link_libraries (tool1cd ${Boost_LIBRARIES})
 

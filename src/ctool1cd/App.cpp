@@ -1,4 +1,4 @@
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -72,7 +72,6 @@ void App::export_all_to_xml(const ParsedCommand &pc)
 // export_to_xml
 void App::export_to_xml(const ParsedCommand &pc)
 {
-	boost::regex *expr = nullptr;
 
 	boost::filesystem::path root_path(pc.param1);
 	if (!directory_exists(root_path)) {
@@ -104,9 +103,9 @@ void App::export_to_xml(const ParsedCommand &pc)
 		return;
 	}
 
-	expr = new boost::regex[k];
+	vector<regex> expr(k);
 	for (int m = 0; m < k; m++) {
-		expr[m] = boost::regex(filters[m]);
+		expr[m] = regex(filters[m]);
 	}
 
 	for (int j = 0; j < base1CD->get_numtables(); j++) {
@@ -132,7 +131,6 @@ void App::export_to_xml(const ParsedCommand &pc)
 		}
 	}
 
-	delete[] expr;
 } // export_to_xml
 
 void App::export_to_binary(const ParsedCommand &pc)
@@ -167,9 +165,9 @@ void App::export_to_binary(const ParsedCommand &pc)
 		return;
 	}
 
-	vector<boost::regex> expr(k);
+	vector<regex> expr(k);
 	for (int m = 0; m < k; m++) {
-		expr[m] = boost::regex(filters[m]);
+		expr[m] = regex(filters[m]);
 	}
 
 	for (int j = 0; j < base1CD->get_numtables(); j++) {
@@ -230,9 +228,9 @@ void App::import_from_binary(const ParsedCommand &pc)
 		return;
 	}
 
-	vector<boost::regex> expr(k);
+	vector<regex> expr(k);
 	for (int m = 0; m < k; m++) {
-		expr[m] = boost::regex(filters[m]);
+		expr[m] = regex(filters[m]);
 	}
 
 	for (int j = 0; j < base1CD->get_numtables(); j++) {

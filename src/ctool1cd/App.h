@@ -6,9 +6,7 @@
 
 #include "Class_1CD.h"
 #include "ParseCommandLine.h"
-#include "String.hpp"
 #include "Messenger.h"
-#include "cfapi/APIcfBase.h"
 
 class App {
 public:

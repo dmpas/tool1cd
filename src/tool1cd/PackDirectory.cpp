@@ -4,12 +4,11 @@
  *  Created on: 8 окт. 2017 г.
  */
 
-#include <regex>
-
 #include "PackDirectory.h"
 #include "DetailedException.h"
 #include "Common.h"
 #include "DetailedException.h"
+#include <System.SysUtils.hpp>
 
 boost::filesystem::path object_path(const boost::filesystem::path &rootpath, const std::string &datahash)
 {
@@ -29,17 +28,23 @@ PackDirectory::PackDirectory(boost::filesystem::path& init_path) {
 PackDirectory::~PackDirectory() {
 }
 
+bool filename_match(const std::string &filename)
+{
+	return System::StartsWithIC(filename, "pack-")
+			&& System::EndsWithIC(filename, ".ind");
+}
+
 void PackDirectory::init(boost::filesystem::path& init_path) {
 	boost::filesystem::path subpath = init_path / "data" / "pack";
 	if(!directory_exists(subpath)) {
 		throw PackDirectoryDoesNotExistException("Не найден каталог хранилища. Обязательный с версии >= 6")
 				.add_detail("Каталог", subpath.string());
 	}
-	std::regex pack_mask("pack-.*\\.ind");
+
 	boost::filesystem::directory_iterator dit(subpath), dend;
 	for (; dit != dend; dit++) {
 		boost::filesystem::path current_path = dit->path();
-		if (!std::regex_match(current_path.filename().string(), pack_mask)) {
+		if (!filename_match(current_path.filename().string())) {
 			continue;
 		}
 		std::shared_ptr<Packdata> pd = std::make_shared<Packdata>(current_path);

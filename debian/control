@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Sergey Batanov <sergey.batanov@dmpas.ru>
 Build-Depends: debhelper (>= 8.0.0), cmake (>= 2.8),
   libboost-filesystem-dev (>= 1.53), libboost-system-dev (>= 1.53),
-  libboost-regex-dev (>= 1.53),
   zlib1g-dev, libstdc++-dev
 Standards-Version: 3.9.4
 Homepage: https://github.com/dmpas/tool1cd

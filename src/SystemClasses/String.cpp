@@ -158,7 +158,18 @@ bool EndsWithIC(const std::string &str, const std::string &substr)
 	if (str.size() < substr.size()) {
 		return false;
 	}
-	return CompareIC(str.substr(str.size() - substr.size(), substr.size()), substr) == 0;
+	return EqualIC(str.substr(str.size() - substr.size(), substr.size()), substr);
+}
+
+bool StartsWithIC(const std::string &str, const std::string &substr)
+{
+	if (substr.empty()) {
+		return true;
+	}
+	if (str.size() < substr.size()) {
+		return false;
+	}
+	return EqualIC(str.substr(0, substr.size()), substr);
 }
 
 int ToIntDef(const std::string &s, int default_value)

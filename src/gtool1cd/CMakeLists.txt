@@ -66,7 +66,7 @@ include_directories (${SOURCE_DIR}/SystemClasses)
 target_link_libraries (gtool1cd tool1cd)
 
 
-find_package (Boost 1.53 REQUIRED COMPONENTS filesystem regex system)
+find_package (Boost 1.53 REQUIRED COMPONENTS filesystem system)
 include_directories (${Boost_INCLUDE_DIRS})
 target_link_libraries (gtool1cd ${Boost_LIBRARIES})
 

@@ -1,5 +1,5 @@
 
-#include <boost/regex.hpp>
+#include <regex>
 
 #include "Parse_tree.h"
 #include "Common.h"
@@ -9,13 +9,13 @@
 using namespace System;
 using namespace std;
 
-const boost::regex exp_number("^-?\\d+$");
-const boost::regex exp_number_exp("^-?\\d+(\\.?\\d*)?((e|E)-?\\d+)?$");
-const boost::regex exp_guid("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-const boost::regex exp_binary("^#base64:[0-9a-zA-Z\\+=\\r\\n\\/]*$");
-const boost::regex exp_binary2("^[0-9a-zA-Z\\+=\\r\\n\\/]+$");
-const boost::regex exp_link("^[0-9]+:[0-9a-fA-F]{32}$");
-const boost::regex exp_binary_d("^#data:[0-9a-zA-Z\\+=\\r\\n\\/]*$");
+const regex exp_number("^-?\\d+$");
+const regex exp_number_exp("^-?\\d+(\\.?\\d*)?((e|E)-?\\d+)?$");
+const regex exp_guid("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+const regex exp_binary("^#base64:[0-9a-zA-Z\\+=\\r\\n\\/]*$");
+const regex exp_binary2("^[0-9a-zA-Z\\+=\\r\\n\\/]+$");
+const regex exp_link("^[0-9]+:[0-9a-fA-F]{32}$");
+const regex exp_binary_d("^#data:[0-9a-zA-Z\\+=\\r\\n\\/]*$");
 
 extern Registrator msreg_g;
 
@@ -240,31 +240,31 @@ node_type classification_value(const std::string &value)
 		return node_type::nd_empty;
 	}
 
-	if(regex_match(value.c_str(), exp_number)) {
+	if(regex_match(value, exp_number)) {
 		return node_type::nd_number;
 	}
 
-	if(regex_match(value.c_str(), exp_number_exp)) {
+	if(regex_match(value, exp_number_exp)) {
 		return node_type::nd_number_exp;
 	}
 
-	if(regex_match(value.c_str(), exp_guid)) {
+	if(regex_match(value, exp_guid)) {
 		return node_type::nd_guid;
 	}
 
-	if(regex_match(value.c_str(), exp_binary)) {
+	if(regex_match(value, exp_binary)) {
 		return node_type::nd_binary;
 	}
 
-	if(regex_match(value.c_str(), exp_link)) {
+	if(regex_match(value, exp_link)) {
 		return node_type::nd_link;
 	}
 
-	if(regex_match(value.c_str(), exp_binary2)) {
+	if(regex_match(value, exp_binary2)) {
 		return node_type::nd_binary2;
 	}
 
-	if(regex_match(value.c_str(), exp_binary_d)) {
+	if(regex_match(value, exp_binary_d)) {
 		return node_type::nd_binary_d;
 	}
 
