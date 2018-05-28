@@ -567,6 +567,11 @@ const MemBlockManager & T_1CD::getMemBlockManager() const
 	return memBlockManager;
 }
 
+void T_1CD::garbage(bool aggressive)
+{
+	memBlockManager.garbage(aggressive);
+}
+
 //---------------------------------------------------------------------------
 void T_1CD::flush()
 {

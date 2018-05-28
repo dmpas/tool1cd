@@ -253,6 +253,7 @@ public:
 	uint32_t get_free_block(); // получить номер свободного блока (и пометить как занятый)
 
 	const MemBlockManager &getMemBlockManager() const;
+	void garbage(bool aggressive = true);
 
 private:
 	mutable Registrator msreg_m;

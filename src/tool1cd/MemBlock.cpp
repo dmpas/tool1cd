@@ -54,7 +54,7 @@ bool for_write, bool read)
 		fs->ReadBuffer(buf, page_size);
 	}
 
-	std::shared_ptr<MemBlock> block(new MemBlock(page_size, block_num));
+	auto block = std::make_shared<MemBlock>(page_size, block_num);
 	std::copy(buf, buf + page_size, std::begin(block->data));
 	return block;
 
