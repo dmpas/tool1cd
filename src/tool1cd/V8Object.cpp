@@ -1223,8 +1223,8 @@ void V8Object::set_len(uint64_t _len)
 			if(fatlevel)
 			{
 				bb = (objtab838*)base->get_block_for_write(b->blocks[numblocks - 1], true);
-				for(cur_data_blocks--; cur_data_blocks >= num_data_blocks; cur_data_blocks--)
-				{
+				while (cur_data_blocks > num_data_blocks) {
+					cur_data_blocks--;
 					i = cur_data_blocks % offsperpage;
 					base->set_block_as_free(bb->blocks[i]);
 					bb->blocks[i] = 0;
@@ -1238,8 +1238,8 @@ void V8Object::set_len(uint64_t _len)
 			}
 			else
 			{
-				for(cur_data_blocks--; cur_data_blocks >= num_data_blocks; cur_data_blocks--)
-				{
+				while (cur_data_blocks > num_data_blocks) {
+					cur_data_blocks--;
 					base->set_block_as_free(bd->blocks[cur_data_blocks]);
 					bd->blocks[cur_data_blocks] = 0;
 				}
