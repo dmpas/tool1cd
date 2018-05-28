@@ -86,13 +86,14 @@ void MainWindow::export_blob_file()
 	
 	for (auto &index : indexes) {
 		Table *t = db->get_table(index.row());
+		qDebug() << QString::fromStdString(t->get_name());
 		t->export_table(boost::filesystem::path(dir.toStdWString()));
 	}
 }
 
 void MainWindow::import_blob_file()
 {
-	auto indexes = ui->tableListView->selectionModel()->selectedIndexes();
+	auto indexes = ui->tableListView->selectionModel()->selectedRows();
 	if (indexes.empty()) {
 		return;
 	}
@@ -104,7 +105,14 @@ void MainWindow::import_blob_file()
 	boost::filesystem::path rootpath(dir.toStdWString());
 	for (auto &index : indexes) {
 		Table *t = db->get_table(index.row());
-		t->import_table(rootpath);
+		qDebug() << QString::fromStdString(t->get_name());
+		
+		try {
+			t->import_table(rootpath);
+		} catch (std::exception &exc) {
+			qDebug() << QString(exc.what());
+		}
+		db->garbage(true);
 	}
 }
 
