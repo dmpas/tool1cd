@@ -881,6 +881,19 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 	Index* curindex = nullptr;
 	int32_t repeat_count; // количество повторов имени записи подряд (для случая, если индекс не уникальный)
 
+	auto primary = std::find_if(indexes.begin(), indexes.end(),
+							   [](Index *index) { return index->is_primary();});
+	if (primary != indexes.end()) {
+		curindex= *primary;
+	}
+	if(curindex) numr = curindex->get_numrecords();
+	else numr = numrecords_found;
+
+	if (numr == 0) {
+		// TODO: убрать костыль
+		return false;
+	}
+
 	char UnicodeHeader[3] = {'\xef', '\xbb', '\xbf'}; // BOM UTF-8
 	string part1 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!--Файл сформирован программой Tool_1CD-->\r\n<Table Name=\"";
 	string part2 = "\">\r\n\t<Fields>\r\n";
@@ -908,12 +921,6 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 	f.WriteString(name);
 	f.WriteString(part2);
 
-	auto primary = std::find_if(indexes.begin(), indexes.end(),
-							   [](Index *index) { return index->is_primary();});
-	if (primary != indexes.end()) {
-		curindex= *primary;
-	}
-
 	int image_count; // количество полей с типом image
 	for (auto field : fields) {
 		f.WriteString(fpart1);
@@ -935,9 +942,6 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 
 	f.WriteString(part3);
 
-	if(curindex) numr = curindex->get_numrecords();
-	else numr = numrecords_found;
-
 	msreg_g.Status(status);
 
 	recname = "";
@@ -945,16 +949,25 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 	bool dircreated = false;
 	boost::filesystem::path dir(_filename + ".blob");
 
+	Field *is_metadata_field = find_field("_ISMETADATA");
+
+	int done_count = 0;
 	for(j = 0; j < numr; j++)
 	{
 		if (j % 100 == 0 && j) {
 			msreg_g.Status(status + to_string(j));
 		}
 
-		f.Write(rpart1.c_str(), rpart1.size());
 		if(curindex) nr = curindex->get_numrec(j);
 		else nr = recordsindex[j];
+
 		std::shared_ptr<TableRecord> rec (get_record(nr));
+		if (is_metadata_field) {
+			if (rec->get<bool>(is_metadata_field) == true) {
+				continue;
+			}
+		}
+
 		if (image_count) {
 			std::string filename = get_file_name_for_record(rec.get());
 			if (EqualIC(filename, recname)) {
@@ -964,6 +977,8 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 				repeat_count = 0;
 			}
 		}
+
+		f.Write(rpart1.c_str(), rpart1.size());
 		for (auto field : fields) {
 			string outputvalue;
 			f.WriteString(rpart3);
@@ -1033,6 +1048,7 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 				f.WriteString(field->get_name());
 				f.WriteString(">\r\n");
 			}
+			done_count++;
 		}
 		f.WriteString(rpart2);
 
@@ -1040,7 +1056,7 @@ bool Table::export_to_xml(const std::string &_filename, bool blob_to_file, bool 
 	f.WriteString(part4);
 
 	msreg_g.Status("");
-	return true;
+	return done_count != 0;
 }
 
 //---------------------------------------------------------------------------
@@ -2385,6 +2401,9 @@ std::string Table::get_file_name_for_record(const TableRecord *rec) const
 				s += "_";
 			}
 			Field* tmp_field = record.field;
+			if (tmp_field == nullptr) {
+				tmp_field = rec->get_table()->get_field(0);
+			}
 			std::string tmp_str = rec->get_string(tmp_field);
 
 			s += tmp_str;

@@ -66,6 +66,10 @@ void MainWindow::show_table_context_menu(const QPoint &pos)
 	connect(&action_export_blob, SIGNAL(triggered()), this, SLOT(export_blob_file()));
 	contextMenu.addAction(&action_export_blob);
 	
+	QAction action_export_xml(tr("Экспорт XML"), this);
+	connect(&action_export_xml, SIGNAL(triggered()), this, SLOT(export_xml_file()));
+	contextMenu.addAction(&action_export_xml);
+
 	QAction action_import_blob(tr("Импорт BLOB"), this);
 	connect(&action_import_blob, SIGNAL(triggered()), this, SLOT(import_blob_file()));
 	contextMenu.addAction(&action_import_blob);
@@ -75,7 +79,7 @@ void MainWindow::show_table_context_menu(const QPoint &pos)
 
 void MainWindow::export_blob_file()
 {
-	auto indexes = ui->tableListView->selectionModel()->selectedIndexes();
+	auto indexes = ui->tableListView->selectionModel()->selectedRows();
 	if (indexes.empty()) {
 		return;
 	}
@@ -87,9 +91,64 @@ void MainWindow::export_blob_file()
 	for (auto &index : indexes) {
 		Table *t = db->get_table(index.row());
 		qDebug() << QString::fromStdString(t->get_name());
-		t->export_table(boost::filesystem::path(dir.toStdWString()));
+		try {
+			t->export_table(boost::filesystem::path(dir.toStdWString()));
+		} catch (std::exception &exc) {
+			qDebug() << QString(exc.what());
+		}
+		db->garbage(true);
 	}
 }
+
+
+void MainWindow::export_xml_file()
+{
+	auto indexes = ui->tableListView->selectionModel()->selectedIndexes();
+	if (indexes.empty()) {
+		return;
+	}
+	QString dir = QFileDialog::getExistingDirectory(this);
+	if (dir.isNull()) {
+		return;
+	}
+
+	std::set<int> done;
+	for (auto &index : indexes) {
+		if (done.count(index.row()) != 0) {
+			continue;
+		}
+		done.insert(index.row());
+		Table *t = db->get_table(index.row());
+		if (QString::fromStdString(t->get_name()).startsWith("_Enum")) {
+			continue;
+		}
+
+		t->fill_records_index();
+		{
+			TableIterator checker(t);
+			if (checker.eof()) {
+				// нет данных - пропускаем
+				// TODO: вынести в настройку
+				continue;
+			}
+		}
+		qDebug() << QString::fromStdString(t->get_name());
+		boost::filesystem::path filepath = boost::filesystem::path(dir.toStdWString())
+				/ t->get_name();
+		filepath.replace_extension("xml");
+		try {
+			if (!t->export_to_xml(filepath.string(), false, true)) {
+				if (boost::filesystem::exists(filepath)) {
+					boost::filesystem::remove(filepath);
+				}
+			}
+		} catch (std::exception &exc) {
+			qDebug() << QString(exc.what());
+		}
+		db->garbage(true);
+	}
+}
+
 
 void MainWindow::import_blob_file()
 {

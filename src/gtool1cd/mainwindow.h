@@ -68,6 +68,8 @@ private slots:
 	
 	void export_blob_file();
 	
+	void export_xml_file();
+
 	void import_blob_file();
 
 private:
