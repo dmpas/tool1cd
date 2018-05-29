@@ -74,12 +74,39 @@ void MainWindow::show_table_context_menu(const QPoint &pos)
 	connect(&action_import_blob, SIGNAL(triggered()), this, SLOT(import_blob_file()));
 	contextMenu.addAction(&action_import_blob);
 	
+	QAction action_delete_table(tr("Удалить таблицу"), this);
+	connect(&action_delete_table, SIGNAL(triggered()), this, SLOT(delete_table()));
+	contextMenu.addAction(&action_delete_table);
+	
 	contextMenu.exec(mapToGlobal(pos));
+}
+
+void MainWindow::delete_table()
+{
+	auto indexes = ui->tableListView->selectionModel()->selectedIndexes();
+	if (indexes.empty()) {
+		return;
+	}
+	std::set<int> done;
+	for (auto &index : indexes) {
+		if (done.count(index.row()) != 0) {
+			continue;
+		}
+		done.insert(index.row());
+		Table *t = db->get_table(index.row());
+		qDebug() << QString::fromStdString(t->get_name());
+		try {
+			db->delete_table(t);
+		} catch (std::exception &exc) {
+			qDebug() << QString(exc.what());
+		}
+		db->garbage(true);
+	}
 }
 
 void MainWindow::export_blob_file()
 {
-	auto indexes = ui->tableListView->selectionModel()->selectedRows();
+	auto indexes = ui->tableListView->selectionModel()->selectedIndexes();
 	if (indexes.empty()) {
 		return;
 	}
@@ -88,7 +115,12 @@ void MainWindow::export_blob_file()
 		return;
 	}
 	
+	std::set<int> done;
 	for (auto &index : indexes) {
+		if (done.count(index.row()) != 0) {
+			continue;
+		}
+		done.insert(index.row());
 		Table *t = db->get_table(index.row());
 		qDebug() << QString::fromStdString(t->get_name());
 		try {
@@ -152,7 +184,7 @@ void MainWindow::export_xml_file()
 
 void MainWindow::import_blob_file()
 {
-	auto indexes = ui->tableListView->selectionModel()->selectedRows();
+	auto indexes = ui->tableListView->selectionModel()->selectedIndexes();
 	if (indexes.empty()) {
 		return;
 	}
@@ -162,7 +194,12 @@ void MainWindow::import_blob_file()
 	}
 	
 	boost::filesystem::path rootpath(dir.toStdWString());
+	std::set<int> done;
 	for (auto &index : indexes) {
+		if (done.count(index.row()) != 0) {
+			continue;
+		}
+		done.insert(index.row());
 		Table *t = db->get_table(index.row());
 		qDebug() << QString::fromStdString(t->get_name());
 		

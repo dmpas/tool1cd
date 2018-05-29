@@ -71,6 +71,8 @@ private slots:
 	void export_xml_file();
 
 	void import_blob_file();
+	
+	void delete_table();
 
 private:
 	Ui::MainWindow *ui;
