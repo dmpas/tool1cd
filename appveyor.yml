@@ -16,7 +16,7 @@ init:
 - ps: Start-Sleep -s 5
 - ps: Restart-Computer
 cache:
-  - C:\Tools\vcpkg\installed -> CMakeLists.txt
+  - C:\Tools\vcpkg\installed
 install:
 - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 - cd %VCPKG_DIR%
