@@ -20,13 +20,13 @@ install:
 - cd %VCPKG_DIR%
 - git pull
 - call .\bootstrap-vcpkg.bat
-- .\vcpkg install boost-filesystem
-- .\vcpkg install boost-system
-- .\vcpkg install boost-regex
-- .\vcpkg install boost-random
-- .\vcpkg install boost-uuid
-- .\vcpkg install boost-crc
-- .\vcpkg install zlib
+- .\vcpkg --triplet x64-windows install boost-filesystem
+- .\vcpkg --triplet x64-windows install boost-system
+- .\vcpkg --triplet x64-windows install boost-regex
+- .\vcpkg --triplet x64-windows install boost-random
+- .\vcpkg --triplet x64-windows install boost-uuid
+- .\vcpkg --triplet x64-windows install boost-crc
+- .\vcpkg --triplet x64-windows install zlib
 - cd %APPVEYOR_BUILD_FOLDER%
 build_script:
 - cmd: >-
@@ -35,6 +35,8 @@ build_script:
     cd tool1cd
 
     cmake -DCMAKE_BUILD_TYPE=Release
+    -DVCPKG_TARGET_ARCHITECTURE=x64
+    -DCMAKE_PREFIX_PATH=%QT_PATH%
     -DCMAKE_TOOLCHAIN_FILE=%VCPKG_DIR%/scripts/buildsystems/vcpkg.cmake
     -DQt6Widgets_DIR="%MY_Qt6Widgets_DIR%"
     ..
