@@ -46,7 +46,7 @@ build_script:
     cd ..
 
 test_script:
-- tool1cd\bin\testproject.exe --reporter junit --out junit.xml
+- tool1cd\bin\Release\testproject.exe --reporter junit --out junit.xml
 
 on_finish:
 - ps: >-
@@ -56,17 +56,9 @@ on_finish:
 
 after_build:
 - cmd: >-
-    SET PATH=%PATH%;"%WIX%/bin"
+    xcopy COPYING tool1cd\bin\Release
 
-    SET PATH=%PATH%;"%QT_PATH%/bin"
-
-    xcopy COPYING tool1cd\bin
-
-    7z a -r tool1cd-%APPVEYOR_BUILD_VERSION%.zip tool1cd\bin
-
-    candle tool1cd.wxs
-
-    light -out tool1cd-%APPVEYOR_BUILD_VERSION%.msi tool1cd.wixobj
+    7z a -r tool1cd-%APPVEYOR_BUILD_VERSION%.zip tool1cd\bin\Release
 
 artifacts:
 - path: tool1cd\bin\ctool1cd.exe
