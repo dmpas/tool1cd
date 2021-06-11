@@ -43,8 +43,6 @@ build_script:
     -DQt6Widgets_DIR="%MY_Qt6Widgets_DIR%"
     ..
 
-    cmake --build . --target gtool1cd
-
     cmake --build . --target ctool1cd
 
     cmake --build . --target testproject
