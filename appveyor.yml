@@ -61,10 +61,8 @@ after_build:
     7z a -r tool1cd-%APPVEYOR_BUILD_VERSION%.zip tool1cd\bin\Release
 
 artifacts:
-- path: tool1cd\bin\ctool1cd.exe
+- path: tool1cd\bin\Release\ctool1cd.exe
   name: ctool1cd.exe
 - path: tool1cd-*.zip
   name: tool1cd.zip
-- path: tool1cd-*.msi
-  name: installer
 deploy: false
