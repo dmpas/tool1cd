@@ -23,12 +23,8 @@ install:
 - git pull
 - call .\bootstrap-vcpkg.bat
 - .\vcpkg --triplet x64-windows install boost-filesystem
-- .\vcpkg --triplet x64-windows install boost-system
-- .\vcpkg --triplet x64-windows install boost-regex
-- .\vcpkg --triplet x64-windows install boost-random
-- .\vcpkg --triplet x64-windows install boost-uuid
-- .\vcpkg --triplet x64-windows install boost-crc
-- .\vcpkg --triplet x64-windows install zlib
+  boost-system boost-regex boost-random
+  boost-uuid boost-crc zlib
 - cd %APPVEYOR_BUILD_FOLDER%
 build_script:
 - cmd: >-
@@ -43,9 +39,9 @@ build_script:
     -DQt6Widgets_DIR="%MY_Qt6Widgets_DIR%"
     ..
 
-    cmake --build . --target ctool1cd
+    cmake --build . --target ctool1cd --config Release
 
-    cmake --build . --target testproject
+    cmake --build . --target testproject --config Release
 
     cd ..
 
