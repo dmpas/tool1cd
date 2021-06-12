@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt6Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Widgets REQUIRED Core5Compat REQUIRED)
 
 set (QHEXEDIT_HEADERS
 		QHexEdit/document/buffer/qfilebuffer.h
@@ -76,6 +76,6 @@ target_link_libraries (gtool1cd PRIVATE ${Boost_LIBRARIES})
 
 find_package (ZLIB REQUIRED)
 include_directories (${ZLIB_INCLUDE_DIRS})
-target_link_libraries (gtool1cd PRIVATE ${ZLIB_LIBRARIES} Qt6::Widgets)
+target_link_libraries (gtool1cd PRIVATE ${ZLIB_LIBRARIES} Qt6::Widgets Qt6::Core5Compat)
 
 install (TARGETS gtool1cd DESTINATION bin)

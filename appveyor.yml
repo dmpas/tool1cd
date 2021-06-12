@@ -25,6 +25,7 @@ install:
 - .\vcpkg --triplet x64-windows install boost-filesystem
   boost-system boost-regex boost-random
   boost-uuid boost-crc zlib
+  vulkan
 - cd %APPVEYOR_BUILD_FOLDER%
 build_script:
 - cmd: >-
