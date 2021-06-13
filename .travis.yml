@@ -16,7 +16,8 @@ matrix:
                   - g++-9
       env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
-        - VULKAN_SDK=/usr/local
+        - VULKAN_SDK_VESION=1.2.176.1
+        - VULKAN_DOWNLOAD=https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz
     - os: osx
       osx_image: xcode12.4
       addons:
@@ -25,9 +26,13 @@ matrix:
           taps: apenngrace/vulkan
           casks: vulkan-sdk
       env:
-        - VULKAN_SDK=/usr/local
+        - VULKAN_SDK_VESION=1.2.176.1
+        - VULKAN_DOWNLOAD=https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz
 before_install:
   - eval "${MATRIX_EVAL}"
+  - wget ${VULKAN_DOWNLOAD}
+    && tar xf vulkansdk-*.tar.gz
+    && source ${VULKAN_SDK_VESION}/setup-env.h
   - git clone https://github.com/microsoft/vcpkg
   - ./vcpkg/bootstrap-vcpkg.sh
   - cd vcpkg
@@ -37,5 +42,6 @@ before_install:
     vulkan
   - cd ..
 script:
-    - cmake -DNOGUI=YES . && cmake --build .
+    - cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DNOGUI=YES .
+      && cmake --build .
     - bin/testproject
