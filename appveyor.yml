@@ -17,8 +17,12 @@ init:
 - ps: Restart-Computer
 cache:
   - C:\Tools\vcpkg\installed
+  - VulkanSDK.exe
 install:
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+- if not exist VulkanSDK.exe
+  curl -L --silent --show-error --output VulkanSDK.exe
+  https://vulkan.lunarg.com/sdk/download/1.2.176.1/windows/VulkanSDK-1.2.176.1-Installer.exe?Human=true
+- VulkanSDK.exe /S- call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 - cd %VCPKG_DIR%
 - git pull
 - call .\bootstrap-vcpkg.bat
@@ -58,6 +62,13 @@ on_finish:
     $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\junit.xml))
 
 after_build:
+- cmd: >-
+    set PATH=%PATH%;%QT_PATH%/bin
+
+    windeployqt --release --no-compiler-runtime --no-translations
+    --no-system-d3d-compiler --no-opendl-sw --no-patchqt
+    tool1cd\bin\Release\gtool1cd.exe
+
 - cmd: >-
     xcopy COPYING tool1cd\bin\Release
 
