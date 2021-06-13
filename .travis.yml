@@ -1,4 +1,6 @@
 language: cpp
+git:
+  depth: 1
 matrix:
     include:
     - os: linux
@@ -7,7 +9,8 @@ matrix:
       addons:
           apt:
               sources:
-                  - https://packages.lunarg.com/vulkan/1.2.141
+                  - sourceline: deb https://packages.lunarg.com/vulkan/1.2.141 xenial main
+                    key_url: https://packages.lunarg.com/lunarg-signing-key-pub.asc
               packages:
                   - vulkan-sdk
                   - build-essential
@@ -17,6 +20,14 @@ matrix:
                   - libboost-system-dev
                   - libboost-regex-dev
     - os: osx
+      addons:
+        homebrew:
+          taps: apenngrace/vulkan
+          casks: vulkan-sdk
+          packages:
+            - boost
+            - cmake
+            - zlib
 script:
     - cmake -DNOGUI=YES . && cmake --build .
     - bin/testproject
