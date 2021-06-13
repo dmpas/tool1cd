@@ -16,7 +16,7 @@ matrix:
                   - g++-9
       env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
-        - VULKAN_SDK=/usr/local/share/vulkan
+        - VULKAN_SDK=/usr/local
     - os: osx
       osx_image: xcode12.4
       addons:
