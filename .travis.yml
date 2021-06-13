@@ -10,8 +10,12 @@ matrix:
               sources:
                   - sourceline: deb https://packages.lunarg.com/vulkan/1.2.141 xenial main
                     key_url: https://packages.lunarg.com/lunarg-signing-key-pub.asc
+                  - sourceline: 'ppa:ubuntu-toolchain-r/test'
               packages:
                   - vulkan-sdk
+                  - g++-9
+      env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
     - os: osx
       osx_image: xcode12.4
       addons:
@@ -20,6 +24,7 @@ matrix:
           taps: apenngrace/vulkan
           casks: vulkan-sdk
 before_install:
+  - eval "${MATRIX_EVAL}"
   - git clone https://github.com/microsoft/vcpkg
   - ./vcpkg/bootstrap-vcpkg.sh
 install:
