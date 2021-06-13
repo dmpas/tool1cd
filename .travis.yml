@@ -31,11 +31,8 @@ matrix:
 before_install:
   - eval "${MATRIX_EVAL}"
   - wget ${VULKAN_DOWNLOAD}
-    && ls -al
     && tar xf vulkansdk-*.tar.gz
-    && ls -al
-    && ls -al ${VULKAN_SDK_VERSION}
-    && source ${VULKAN_SDK_VERSION}/setup-env.h
+    && source ${VULKAN_SDK_VERSION}/setup-env.sh
   - git clone https://github.com/microsoft/vcpkg
   - ./vcpkg/bootstrap-vcpkg.sh
   - cd vcpkg
