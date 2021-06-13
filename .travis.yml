@@ -22,6 +22,7 @@ matrix:
     - os: osx
       addons:
         homebrew:
+          update: true
           taps: apenngrace/vulkan
           casks: vulkan-sdk
           packages:
