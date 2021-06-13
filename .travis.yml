@@ -25,7 +25,7 @@ matrix:
           taps: apenngrace/vulkan
           casks: vulkan-sdk
       env:
-        - VULKAN_SDK=/usr/local/share/vulkan
+        - VULKAN_SDK=/usr/local
 before_install:
   - eval "${MATRIX_EVAL}"
   - git clone https://github.com/microsoft/vcpkg
