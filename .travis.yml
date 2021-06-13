@@ -34,6 +34,7 @@ before_install:
     && ls -al
     && tar xf vulkansdk-*.tar.gz
     && ls -al
+    && ls -al ${VULKAN_SDK_VERSION}
     && source ${VULKAN_SDK_VERSION}/setup-env.h
   - git clone https://github.com/microsoft/vcpkg
   - ./vcpkg/bootstrap-vcpkg.sh
