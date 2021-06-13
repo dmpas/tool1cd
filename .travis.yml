@@ -5,7 +5,6 @@ matrix:
     include:
     - os: linux
       dist: xenial
-      sudo: required
       addons:
           apt:
               sources:
@@ -13,12 +12,6 @@ matrix:
                     key_url: https://packages.lunarg.com/lunarg-signing-key-pub.asc
               packages:
                   - vulkan-sdk
-                  - build-essential
-                  - cmake
-                  - zlib1g-dev
-                  - libboost-filesystem-dev
-                  - libboost-system-dev
-                  - libboost-regex-dev
     - os: osx
       osx_image: xcode12.4
       addons:
@@ -26,10 +19,16 @@ matrix:
           update: true
           taps: apenngrace/vulkan
           casks: vulkan-sdk
-          packages:
-            - boost
-            - cmake
-            - zlib
+before_install:
+  - git clone https://github.com/microsoft/vcpkg
+  - ./vcpkg/bootstrap-vcpkg.sh
+install:
+  - cd vcpkg
+  - ./vcpkg install boost-filesystem
+    boost-system boost-regex boost-random
+    boost-uuid boost-crc zlib
+    vulkan
+  - cd ..
 script:
     - cmake -DNOGUI=YES . && cmake --build .
     - bin/testproject
