@@ -20,6 +20,7 @@ matrix:
                   - libboost-system-dev
                   - libboost-regex-dev
     - os: osx
+      osx_image: xcode10.1
       addons:
         homebrew:
           update: true
