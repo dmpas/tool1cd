@@ -54,7 +54,7 @@ build_script:
     cmake -DCMAKE_BUILD_TYPE=Release
     -DVCPKG_TARGET_ARCHITECTURE=x64
     -DCMAKE_PREFIX_PATH=%QT_PATH%
-    -DCMAKE_TOOLCHAIN_FILE=%VCPKG_DIR%/scripts/buildsystems/vcpkg.cmake
+    -DCMAKE_TOOLCHAIN_FILE=$env:Path/scripts/buildsystems/vcpkg.cmake
     -DQt6Widgets_DIR="%MY_Qt6Widgets_DIR%"
     ..
 
