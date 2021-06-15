@@ -21,8 +21,9 @@ for:
     only:
       - image: Visual Studio 2019
   environment:
-    MY_Qt6Widgets_DIR: C:\Qt\6.0.1\msvc2019_64\lib\cmake\Qt5Widgets
+    MY_Qt6Widgets_DIR: C:\Qt\6.0.1\msvc2019_64\lib\cmake\Qt6Widgets
     QT_PATH: C:\Qt\6.0.1\msvc2019_64
+    Qt6_DIR: C:\Qt\6.0.1\msvc2019_64
   init:
     - ps: Set-WinSystemLocale ru-RU
     - ps: Start-Sleep -s 5
@@ -46,6 +47,7 @@ for:
   init:
     - export CXX=g++-9 CC=gcc-9
     - export QT_PATH="$HOME/Qt/6.0.1/gcc_64"
+    - export Qt6_DIR="$HOME/Qt/6.0.1/gcc_64"
     - export MY_Qt6Widgets_DIR="$HOME/Qt/6.0.1/gcc_64/lib/cmake/Qt6Widgets"
   install:
     - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
