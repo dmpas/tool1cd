@@ -40,9 +40,7 @@ for:
 -
   matrix:
     only:
-      - image:
-        - Ubuntu
-        - macOS
+      - image: Ubuntu
   init:
     - export CXX=g++-9 CC=gcc-9
     - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
