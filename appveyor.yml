@@ -42,9 +42,7 @@ for:
       - image: Visual Studio 2019
   init:
     - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-    - cmd: if not exist VulkanSDK.exe
-      curl -L --silent --show-error --output VulkanSDK.exe
-      %VULKAN_DOWNLOAD_URL%
+    - cmd: if not exist VulkanSDK.exe curl -L --silent --show-error --output VulkanSDK.exe %VULKAN_DOWNLOAD_URL%
     - cmd: cd %VCPKG%
     - cmd: git pull
     - cmd: call .\bootstrap-vcpkg.bat
