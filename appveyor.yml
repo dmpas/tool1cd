@@ -31,9 +31,10 @@ for:
     - cmd: cd %VCPKG_DIR%
     - cmd: git pull
     - cmd: call .\bootstrap-vcpkg.bat
+    - cmd: vcpkg.exe --triplet x64-windows install %VCPKG_LIBS%
+    - cmd: cd %APPVEYOR_BUILD_FOLDER%
     - cmd: if not exist VulkanSDK.exe curl -L --silent --show-error --output VulkanSDK.exe %VULKAN_DOWNLOAD_URL%
     - cmd: VulkanSDK.exe /S
-    - cmd: "%VCPKG_DIR%\vcpkg.exe --triplet x64-windows install %VCPKG_LIBS%"
   cache:
     - C:\Tools\vcpkg\installed
     - VulkanSDK.exe
