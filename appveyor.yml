@@ -7,8 +7,6 @@ pull_requests:
   do_not_increment_build_number: true
 clone_depth: 1
 environment:
-  MY_Qt6Widgets_DIR: C:\Qt\6.0.1\msvc2019_64\lib\cmake\Qt5Widgets
-  QT_PATH: C:\Qt\6.0.1\msvc2019_64
   VULKAN_VERSION: 1.2.176.1
   VULKAN_SDK: C:\VulkanSDK\1.2.176.1
   VULKAN_DOWNLOAD_URL: https://vulkan.lunarg.com/sdk/download/1.2.176.1/windows/VulkanSDK-1.2.176.1-Installer.exe?Human=true
@@ -45,11 +43,10 @@ for:
   matrix:
     only:
       - image: Ubuntu
-  environment:
-    MY_Qt6Widgets_DIR: "$HOME/Qt/6.0.1/gcc_64/lib/cmake/Qt6Widgets"
-    QT_PATH: "$HOME/Qt/6.0.1/gcc_64"
   init:
     - export CXX=g++-9 CC=gcc-9
+    - export QT_PATH="$HOME/Qt/6.0.1/gcc_64"
+    - export MY_Qt6Widgets_DIR="$HOME/Qt/6.0.1/gcc_64/lib/cmake/Qt6Widgets"
   install:
     - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
     - ../vcpkg/bootstrap-vcpkg.sh
