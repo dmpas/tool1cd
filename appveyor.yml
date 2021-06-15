@@ -9,9 +9,6 @@ clone_depth: 1
 environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
   VULKAN_VERSION: 1.2.176.1
-  VULKAN_SDK: C:\VulkanSDK\1.2.176.1
-  VULKAN_DOWNLOAD_URL: https://vulkan.lunarg.com/sdk/download/1.2.176.1/windows/VulkanSDK-1.2.176.1-Installer.exe?Human=true
-  VCPKG_DIR: C:\Tools\vcpkg
   VCPKG_LIBS: boost-filesystem
     boost-system boost-regex boost-random
     boost-uuid boost-crc zlib
@@ -22,6 +19,9 @@ for:
     only:
       - image: Visual Studio 2019
   environment:
+    VCPKG_DIR: C:\Tools\vcpkg
+    VULKAN_SDK: C:\VulkanSDK\1.2.176.1
+    VULKAN_DOWNLOAD_URL: https://vulkan.lunarg.com/sdk/download/1.2.176.1/windows/VulkanSDK-1.2.176.1-Installer.exe?Human=true
     MY_Qt6Widgets_DIR: C:\Qt\6.0.1\msvc2019_64\lib\cmake\Qt6Widgets
     QT_PATH: C:\Qt\6.0.1\msvc2019_64
     Qt6_DIR: C:\Qt\6.0.1\msvc2019_64
@@ -69,6 +69,17 @@ for:
   cache:
     - ../vcpkg/installed
     - VulkanSDK.tar.gz
+-
+  matrix:
+    only:
+      - image: macOS
+  install:
+    - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
+    - ../vcpkg/bootstrap-vcpkg.sh
+    - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
+    - ../vcpkg/vcpkg install ${VCPKG_LIBS}
+  cache:
+    - ../vcpkg/installed
 build_script:
 - ps: >-
     mkdir tool1cd
