@@ -51,7 +51,7 @@ for:
     - ps: Restart-Computer
   install:
     - cmd: VulkanSDK.exe /S
-    - cmd: %VCPKG_DIR%\vcpkg.exe --triplet x64-windows install %VCPKG_LIBS%
+    - cmd: "%VCPKG_DIR%\vcpkg.exe --triplet x64-windows install %VCPKG_LIBS%"
   cache:
     - C:\Tools\vcpkg\installed
     - VulkanSDK.exe
