@@ -39,8 +39,8 @@ for:
     - VulkanSDK.exe
 -
   matrix:
-    exclude:
-      - image: Visual Studio 2019
+    only:
+      - image: [Ubuntu, macOS]
   init:
     - export CXX=g++-9 CC=gcc-9
     - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
