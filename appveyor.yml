@@ -13,38 +13,50 @@ environment:
   VULKAN_VERSION: 1.2.176.1
   VULKAN_SDK: C:\VulkanSDK\1.2.176.1
   VULKAN_DOWNLOAD_URL: https://vulkan.lunarg.com/sdk/download/1.2.176.1/windows/VulkanSDK-1.2.176.1-Installer.exe?Human=true
+  VCPKG_LIBS: boost-filesystem
+    boost-system boost-regex boost-random
+    boost-uuid boost-crc zlib
+    vulkan
 for:
 -
   matrix:
-    only:
-      - image: Ubuntu
+    exclude:
+      - image: Visual Studio 2019
   init:
     - export CXX=g++-9 CC=gcc-9
+    - git clone https://github.com/microsoft/vcpkg.git
+    - ./vcpkg/bootstrap-vcpkg.sh
+    - if [ ! -f VulkanSDK.tar.gz ]; then
+      curl -L --silent --show-error --output VulkanSDK.tar.gz
+      "https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz" ;
+      fi
+  install:
+    - tar -xf VulkanSDK && source ${VULKAN_VERSION}/setup-env.sh
+    - ./vcpkg/vcpkg install ${VCPKG_LIBS}
+  cache:
+    - ./vcpkg/installed
+    - VulkanSDK.tar.gz
 -
   matrix:
     only:
       - image: Visual Studio 2019
   init:
-  - ps: Set-WinSystemLocale ru-RU
-  - ps: Start-Sleep -s 5
-  - ps: Restart-Computer
-cache:
-- C:\Tools\vcpkg\installed
-- VulkanSDK.exe
-install:
-- if not exist VulkanSDK.exe
-  curl -L --silent --show-error --output VulkanSDK.exe
-  %VULKAN_DOWNLOAD_URL%
-- VulkanSDK.exe /S
-- call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-- cd %VCPKG_DIR%
-- git pull
-- call .\bootstrap-vcpkg.bat
-- .\vcpkg --triplet x64-windows install boost-filesystem
-  boost-system boost-regex boost-random
-  boost-uuid boost-crc zlib
-  vulkan
-- cd %APPVEYOR_BUILD_FOLDER%
+    - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+    - cmd: if not exist VulkanSDK.exe
+      curl -L --silent --show-error --output VulkanSDK.exe
+      %VULKAN_DOWNLOAD_URL%
+    - cmd: cd %VCPKG%
+    - cmd: git pull
+    - cmd: call .\bootstrap-vcpkg.bat
+    - ps: Set-WinSystemLocale ru-RU
+    - ps: Start-Sleep -s 5
+    - ps: Restart-Computer
+  install:
+    - cmd: VulkanSDK.exe /S
+    - cmd: %VCPKG_DIR%\vcpkg.exe --triplet x64-windows install %VCPKG_LIBS%
+  cache:
+    - C:\Tools\vcpkg\installed
+    - VulkanSDK.exe
 build_script:
 - ps: >-
     mkdir tool1cd
