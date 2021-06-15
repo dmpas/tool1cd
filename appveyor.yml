@@ -20,25 +20,6 @@ environment:
 for:
 -
   matrix:
-    exclude:
-      - image: Visual Studio 2019
-  init:
-    - export CXX=g++-9 CC=gcc-9
-    - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
-    - ../vcpkg/bootstrap-vcpkg.sh
-    - if [ ! -f VulkanSDK.tar.gz ]; then
-      curl -L --silent --show-error --output VulkanSDK.tar.gz
-      "https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz" ;
-      fi
-  install:
-    - tar -xf VulkanSDK && source ${VULKAN_VERSION}/setup-env.sh
-    - ../vcpkg/vcpkg install ${VCPKG_LIBS}
-    - export VCPKG_DIR=$((pwd))../vcpkg
-  cache:
-    - ./vcpkg/installed
-    - VulkanSDK.tar.gz
--
-  matrix:
     only:
       - image: Visual Studio 2019
   init:
@@ -56,6 +37,25 @@ for:
   cache:
     - C:\Tools\vcpkg\installed
     - VulkanSDK.exe
+-
+  matrix:
+    exclude:
+      - image: Visual Studio 2019
+  init:
+    - export CXX=g++-9 CC=gcc-9
+    - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
+    - ../vcpkg/bootstrap-vcpkg.sh
+    - if [ ! -f VulkanSDK.tar.gz ]; then
+      curl -L --silent --show-error --output VulkanSDK.tar.gz
+      "https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz" ;
+      fi
+  install:
+    - tar -xf VulkanSDK && source ${VULKAN_VERSION}/setup-env.sh
+    - ../vcpkg/vcpkg install ${VCPKG_LIBS}
+    - export VCPKG_DIR=$((pwd))../vcpkg
+  cache:
+    - ./vcpkg/installed
+    - VulkanSDK.tar.gz
 build_script:
 - ps: >-
     mkdir tool1cd
