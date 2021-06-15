@@ -56,6 +56,7 @@ for:
       libpng-dev libxcb-keysyms1-dev libxcb-dri3-dev libx11-dev
       libmirclient-dev libwayland-dev libxrandr-dev libxcb-randr0-dev libxcb-ewmh-dev
       python3 bison libx11-xcb-dev liblz4-dev libzstd-dev
+      libgl1-mesa-dev
     - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
     - ../vcpkg/bootstrap-vcpkg.sh
     - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
