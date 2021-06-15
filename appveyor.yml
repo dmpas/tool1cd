@@ -52,7 +52,7 @@ for:
       curl -L --silent --show-error --output VulkanSDK.tar.gz
       "https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz" ;
       fi
-    - tar -xf VulkanSDK && source ${VULKAN_VERSION}/setup-env.sh
+    - tar -xf VulkanSDK.tar.gz && source ${VULKAN_VERSION}/setup-env.sh
     - ../vcpkg/vcpkg install ${VCPKG_LIBS}
   cache:
     - ./vcpkg/installed
