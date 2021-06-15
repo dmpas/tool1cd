@@ -23,15 +23,15 @@ for:
     only:
       - image: Visual Studio 2019
   init:
-    - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
-    - cmd: if not exist VulkanSDK.exe curl -L --silent --show-error --output VulkanSDK.exe %VULKAN_DOWNLOAD_URL%
-    - cmd: cd %VCPKG_DIR%
-    - cmd: git pull
-    - cmd: call .\bootstrap-vcpkg.bat
     - ps: Set-WinSystemLocale ru-RU
     - ps: Start-Sleep -s 5
     - ps: Restart-Computer
   install:
+    - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+    - cmd: cd %VCPKG_DIR%
+    - cmd: git pull
+    - cmd: call .\bootstrap-vcpkg.bat
+    - cmd: if not exist VulkanSDK.exe curl -L --silent --show-error --output VulkanSDK.exe %VULKAN_DOWNLOAD_URL%
     - cmd: VulkanSDK.exe /S
     - cmd: "%VCPKG_DIR%\vcpkg.exe --triplet x64-windows install %VCPKG_LIBS%"
   cache:
@@ -43,6 +43,7 @@ for:
       - image: Ubuntu
   init:
     - export CXX=g++-9 CC=gcc-9
+  install:
     - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
     - ../vcpkg/bootstrap-vcpkg.sh
     - export VCPKG_DIR=$((pwd))../vcpkg
@@ -50,7 +51,6 @@ for:
       curl -L --silent --show-error --output VulkanSDK.tar.gz
       "https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz" ;
       fi
-  install:
     - tar -xf VulkanSDK && source ${VULKAN_VERSION}/setup-env.sh
     - ../vcpkg/vcpkg install ${VCPKG_LIBS}
   cache:
