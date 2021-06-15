@@ -67,7 +67,7 @@ for:
     - tar -xf VulkanSDK.tar.gz && source ${VULKAN_VERSION}/setup-env.sh
     - ../vcpkg/vcpkg install ${VCPKG_LIBS}
   cache:
-    - ./vcpkg/installed
+    - ../vcpkg/installed
     - VulkanSDK.tar.gz
 build_script:
 - ps: >-
