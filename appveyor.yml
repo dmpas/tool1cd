@@ -1,6 +1,6 @@
 version: 1.0.1.{build}
 image:
-  - Ubuntu
+  - Ubuntu2004
   - macOS
   - Visual Studio 2019
 pull_requests:
@@ -44,7 +44,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
+      - image: Ubuntu2004
   init:
     - export CXX=g++-9 CC=gcc-9
     - export QT_PATH="$HOME/Qt/6.0.1/gcc_64"
