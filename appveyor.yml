@@ -1,7 +1,7 @@
 version: 1.0.2.{build}
 image:
-  - Ubuntu2004
   - macOS
+  - Ubuntu2004
   - Visual Studio 2019
 pull_requests:
   do_not_increment_build_number: true
