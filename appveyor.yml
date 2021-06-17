@@ -50,6 +50,9 @@ for:
     - export QT_PATH="$HOME/Qt/6.0.1/gcc_64"
     - export Qt6_DIR="$HOME/Qt/6.0.1/gcc_64"
     - export MY_Qt6Widgets_DIR="$HOME/Qt/6.0.1/gcc_64/lib/cmake/Qt6Widgets"
+    - if [ ! -d ../vcpkg ]; then git clone https://github.com/microsoft/vcpkg.git ../vcpkg ; fi
+    - "(cd ../vcpkg && ./git pull && ./bootstrap-vcpkg.sh)"
+    - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
   install:
     - sudo apt update -q -y
     - sudo apt install -q -y libglm-dev libxcb-dri3-0 libxcb-present0 libpciaccess0
@@ -57,9 +60,6 @@ for:
       libmirclient-dev libwayland-dev libxrandr-dev libxcb-randr0-dev libxcb-ewmh-dev
       python3 bison libx11-xcb-dev liblz4-dev libzstd-dev
       libgl1-mesa-dev
-    - if [ ! -d ../vcpkg ]; then git clone https://github.com/microsoft/vcpkg.git ../vcpkg ; fi
-    - "(cd ../vcpkg && ./git pull && ./bootstrap-vcpkg.sh)"
-    - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
     - if [ ! -f VulkanSDK.tar.gz ]; then
       curl -L --silent --show-error --output VulkanSDK.tar.gz
       "https://sdk.lunarg.com/sdk/download/1.2.176.1/linux/vulkansdk-linux-x86_64-1.2.176.1.tar.gz" ;
