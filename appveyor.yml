@@ -73,10 +73,11 @@ for:
   matrix:
     only:
       - image: macOS
-  install:
-    - git clone https://github.com/microsoft/vcpkg.git ../vcpkg
-    - ../vcpkg/bootstrap-vcpkg.sh
+  init:
+    - if [ ! -d ../vcpkg ]; then git clone https://github.com/microsoft/vcpkg.git ../vcpkg ; fi
+    - "(cd ../vcpkg && git pull && ./bootstrap-vcpkg.sh)"
     - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
+  install:
     - ../vcpkg/vcpkg install ${VCPKG_LIBS}
   cache:
     - ../vcpkg/installed
