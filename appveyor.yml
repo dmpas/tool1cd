@@ -57,7 +57,7 @@ for:
       libmirclient-dev libwayland-dev libxrandr-dev libxcb-randr0-dev libxcb-ewmh-dev
       python3 bison libx11-xcb-dev liblz4-dev libzstd-dev
       libgl1-mesa-dev
-    - if [ ! -d ../vcpkg ]; git clone https://github.com/microsoft/vcpkg.git ../vcpkg ; fi
+    - if [ ! -d ../vcpkg ]; then git clone https://github.com/microsoft/vcpkg.git ../vcpkg ; fi
     - "(cd ../vcpkg && ./git pull && ./bootstrap-vcpkg.sh)"
     - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
     - if [ ! -f VulkanSDK.tar.gz ]; then
