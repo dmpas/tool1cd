@@ -79,7 +79,7 @@ for:
     - export VCPKG_DIR=`dirname $(pwd)/../vcpkg/vcpkg`
     - export QT_PATH="$HOME/Qt/6.2/clang_64"
     - export Qt6_DIR="$HOME/Qt/6.2/clang_64"
-    - export MY_Qt6Widgets_DIR="$HOME/Qt/6.2.0/clang_64/lib/cmake/Qt6Widgets"
+    - export MY_Qt6Widgets_DIR="$HOME/Qt/6.2/clang_64/lib/cmake/Qt6Widgets"
   install:
     - if [ ! -f VulkanSDK.dmg ]; then
       curl -L --silent --show-error --output VulkanSDK.dmg
