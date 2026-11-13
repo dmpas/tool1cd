@@ -44,257 +44,128 @@ deb-пакет будет в каталоге уровнем выше с наз�
 
 ## Windows
 
-Установить систему генерации проектов:
-https://cmake.org/download/
+Нужны Visual Studio 2022 с рабочей нагрузкой «Разработка классических приложений на C++» (в комплекте есть CMake) и [vcpkg](https://github.com/microsoft/vcpkg). CI проверяет сборку на теге vcpkg `2026.10.16`.
 
-### Сборка консольного проекта в Visual Studio 2017
+```powershell
+git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+git -C C:\vcpkg checkout 2026.10.16
+C:\vcpkg\bootstrap-vcpkg.bat
+```
 
-Установка зависимостей:
+Каталоги `C:\vcpkg` и `C:\Qt\6.8.3\msvc2022_64` ниже — примеры. Подставьте свои пути.
 
-Скачать и установить скомпилированные библиотеки `boost x86`
-https://sourceforge.net/projects/boost/files/boost-binaries/1.66.0/boost_1_66_0-msvc-14.1-32.exe/download
+Сборка консоли вместе с GUI и сборка только консоли конфигурируются отдельно: у них разные triplet vcpkg и разный runtime CRT. Для каждой нужен свой каталог `build`.
 
-В качестве каталога назначения указать, например `C:\Libs\boost_1_66_0`
+### Консоль и GUI
 
-Скачать библиотеку `zlib` и скомпилировать
-https://github.com/madler/zlib/archive/v1.2.8.zip
+Так проект собирается в CI. Готовые библиотеки Qt — динамические (`/MD`), поэтому triplet vcpkg тоже динамический: `x64-windows`. `NOGUI` не задаётся.
 
-Распаковать архив, например в каталог `C:\Libs\zlib-1.2.8`
+Зависимости vcpkg:
 
-Открыть каталог с *корневым* `CMakeLists.txt` через меню `File -> Open -> CMake...`
-Для настройки зависимостей и типов проектов `Debug, Release`, необходимо 
-через меню `Cmake -> Change CMake Settings -> CMakeLists.txt` создать файл `CMakeSettings.json`
+```powershell
+C:\vcpkg\vcpkg.exe install --triplet x64-windows `
+  boost-filesystem boost-system boost-regex boost-random `
+  boost-uuid boost-crc boost-algorithm zlib vulkan
+```
 
-Замените переменные в секции `x86-Debug`:
+[Qt 6.8.3](https://www.qt.io/download), комплект **MSVC 2022 64-bit**, модуль **Qt 5 Compatibility** (`Core5Compat`). В CI используется именно 6.8.3.
 
-`"generator": "Visual Studio 15 2017",` - для какой IDE создавать проект
+[Vulkan SDK](https://vulkan.lunarg.com/sdk/home) версии **1.4.309.0**. Перед конфигурацией переменная `VULKAN_SDK` должна указывать на каталог установки, обычно `C:\VulkanSDK\1.4.309.0`.
 
-`"buildRoot": "${projectDir}\\build\\${name}",` - каталог, где будут хранится сгенерированные проекты `${projectDir}` - путь до корневого `CMakeLists.txt`
+```powershell
+cd C:\path\to\tool1cd
+mkdir build
+cd build
+$env:VULKAN_SDK = "C:\VulkanSDK\1.4.309.0"
+cmake -G "Visual Studio 17 2022" -A x64 `
+  -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+  -DVCPKG_TARGET_TRIPLET=x64-windows `
+  -DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/msvc2022_64 `
+  ..
+cmake --build . --config Release --target ctool1cd --target testproject --target gtool1cd
+```
 
-`"installRoot": "${projectDir}\\install\\${name}",`
+Готовые файлы: `build\bin\Release\ctool1cd.exe`, `build\bin\Release\testproject.exe`, `build\bin\Release\gtool1cd.exe`.
 
-`"buildCommandArgs": "-v:minimal",`
+Чтобы GUI запускался рядом со своими DLL Qt:
 
-Должен получиться такой файл:
+```powershell
+$env:PATH = "C:\Qt\6.8.3\msvc2022_64\bin;$env:PATH"
+windeployqt --release --no-compiler-runtime --no-translations `
+  --no-system-d3d-compiler --no-opengl-sw --no-patchqt `
+  .\bin\Release\gtool1cd.exe
+```
+
+Открыть каталог в Visual Studio можно через `Файл → Открыть → Папка` (корневой `CMakeLists.txt`). В `CMakeSettings.json` для этой же сборки:
 
 ```json
- "configurations": [
+{
+  "configurations": [
     {
-      "name": "x86-Debug",
-      "generator": "Visual Studio 15 2017",
-      "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x86" ],
+      "name": "x64-Release",
+      "generator": "Visual Studio 17 2022",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v:minimal",
-      "ctestCommandArgs": ""
+      "cmakeCommandArgs": "-A x64 -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/msvc2022_64",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": []
     }
   ]
 }
 ```
 
-Через меню `Cmake -> Only build` выбрать цель `zlibstaticd.lib`
-Артифакты сборки будут находится подобном каталоге `C:\libs\zlib-1.2.8\build\x86-Debug\Debug`
-После сборки необходимо скопировать файл `zconf.h` в каталог `C:\Libs\zlib-1.2.8`
+`VULKAN_SDK` задайте в окружении до открытия папки.
 
-Генерация консольного проекта:
+### Только консоль
 
-Visual Studio 2017 поддерживает работу с cmake без предварительной генерации проекта
+`-DNOGUI=ON` на MSVC переключает runtime на статический (`/MT`) и просит статический Boost. Triplet vcpkg — `x64-windows-static`. Qt и Vulkan не используются.
 
-Открыть каталог с *корневым* `CMakeLists.txt` через меню `File -> Open -> CMake...`
-
-Для настройки зависимостей и типов проектов `Debug, Release`, необходимо 
-через меню `Cmake -> Change CMake Settings -> CMakeLists.txt` создать файл `CMakeSettings.json`
-
-Замените переменные:
-
-`"generator": "Visual Studio 15 2017",` - для какой IDE создавать проект
-
-`"buildRoot": "${projectDir}\\build\\${name}",` - каталог, где будут хранится сгенерированные проекты `${projectDir}` - путь до корневого `CMakeLists.txt`
-
-`"installRoot": "${projectDir}\\install\\${name}",`
-
-`"buildCommandArgs": "-v:minimal",`
-
-Добавить переменные cmake:
-
-```json
- "variables": [
-        {
-          "name": "Boost_FILESYSTEM_LIBRARY_DEBUG",
-          "value": "C:\\libs\\boost_1_66_0\\lib32-msvc-14.1\\boost_filesystem-vc141-mt-gd-x32-1_66.lib"
-        },
-        {
-          "name": "Boost_SYSTEM_LIBRARY_DEBUG",
-          "value": "C:\\libs\\boost_1_66_0\\lib32-msvc-14.1\\boost_system-vc141-mt-gd-x32-1_66.lib"
-        },
-        {
-          "name": "Boost_REGEX_LIBRARY_DEBUG",
-          "value": "C:\\libs\\boost_1_66_0\\lib32-msvc-14.1\\boost_regex-vc141-mt-gd-x32-1_66.lib"
-        },
-        {
-          "name": "NOGUI",
-          "value": "true"
-        },
-        {
-          "name": "BOOST_ROOT",
-          "value": "C:\\libs\\boost_1_66_0"
-        },
-        {
-          "name": "BOOST_LIBRARYDIR",
-          "value": "C:\\libs\\boost_1_66_0\\lib32-msvc-14.1"
-        },
-        {
-          "name": "BOOST_INCLUDEDIR",
-          "value": "C:\\libs\\boost_1_66_0"
-        },
-        {
-          "name": "ZLIB_LIBRARY_DEBUG",
-          "value": "C:\\libs\\zlib-1.2.8\\build\\x86-Debug\\Debug\\zlibstaticd.lib"
-        },
-        {
-          "name": "ZLIB_INCLUDE_DIR",
-          "value": "C:\\libs\\zlib-1.2.8"
-        }
-      ]
+```powershell
+C:\vcpkg\vcpkg.exe install --triplet x64-windows-static `
+  boost-filesystem boost-system boost-regex boost-random `
+  boost-uuid boost-crc boost-algorithm zlib
 ```
 
-### Сборка проекта с поддержкой GUI в Visual Studio 2017
-
-Установка зависимостей:
-Скачать и установить скомпилированные библиотеки [Qt](https://www.qt.io/download).
-Необходимо установить комплект библиотек собранных с помощью `msvc2017_64`
-
-Скачать и установить скомпилированные библиотеки `boost x64`
-https://sourceforge.net/projects/boost/files/boost-binaries/1.66.0/boost_1_66_0-msvc-14.1-64.exe/download
-
-В качестве каталога назначения указать, например `C:\Libs\boost_1_66_0`.
-
-Скачать библиотеку `zlib` и скомпилировать
-https://github.com/madler/zlib/archive/v1.2.8.zip
-
-Распаковать архив, например в каталог `C:\Libs\zlib-1.2.8`
-
-Открыть каталог с *корневым* `CMakeLists.txt` через меню `File -> Open -> CMake...`
-Для настройки зависимостей и типов проектов `Debug, Release`, необходимо 
-через меню `Cmake -> Change CMake Settings -> CMakeLists.txt` создать файл `CMakeSettings.json`
-
-Замените переменные в секции `x64-Debug`:
-
-`"generator": "Visual Studio 15 2017 Win64",` - для какой IDE создавать проект
-
-`"buildRoot": "${projectDir}\\build\\${name}",` - каталог, где будут хранится сгенерированные проекты `${projectDir}` - путь до корневого `CMakeLists.txt`
-
-`"installRoot": "${projectDir}\\install\\${name}",`
-
-`"buildCommandArgs": "-v:minimal",`
-
-Должен получиться такой файл:
-
-```json
- "configurations": [
-    {
-      "name": "x64-Debug",
-      "generator": "Visual Studio 15 2017 Win64",
-      "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x64" ],
-      "buildRoot": "${projectDir}\\build\\${name}",
-      "installRoot": "${projectDir}\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v:minimal",
-      "ctestCommandArgs": ""
-    }
-  ]
-}
+```powershell
+cd C:\path\to\tool1cd
+mkdir build-console
+cd build-console
+cmake -G "Visual Studio 17 2022" -A x64 -DNOGUI=ON `
+  -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+  -DVCPKG_TARGET_TRIPLET=x64-windows-static `
+  ..
+cmake --build . --config Release --target ctool1cd --target testproject
 ```
 
-Через меню `Cmake -> Only build` выбрать цель `zlibstaticd.lib`
-Артифакты сборки будут находится подобном каталоге `C:\libs\zlib-1.2.8\build\x64-Debug\Debug`
-После сборки необходимо скопировать файл `zconf.h` в каталог `C:\Libs\zlib-1.2.8`
-
-Генерация проектов (консольного, GUI):
-
-Visual Studio 2017 поддерживает работу с cmake без предварительной генерации проекта
-
-Открыть каталог с *корневым* `CMakeLists.txt` через меню `File -> Open -> CMake...`
-
-Для настройки зависимостей и типов проектов `Debug, Release`, необходимо 
-через меню `Cmake -> Change CMake Settings -> CMakeLists.txt` создать файл `CMakeSettings.json`
-
-Заменить переменные в секции `x64-Debug`:
-
-`"generator": "Visual Studio 15 2017 Win64",` - для какой IDE создавать проект
-
-`"buildRoot": "${projectDir}\\build\\${name}",` - каталог, где будут хранится сгенерированные проекты `${projectDir}` - путь до корневого `CMakeLists.txt`
-
-`"installRoot": "${projectDir}\\install\\${name}",`
-
-`"buildCommandArgs": "-v:minimal",`
-
-Добавить переменные cmake:
-
-```json
- "variables": [
-        {
-          "name": "Boost_FILESYSTEM_LIBRARY_DEBUG",
-          "value": "C:\\libs\\boost_1_66_0\\lib64-msvc-14.1\\boost_filesystem-vc141-mt-gd-x64-1_66.lib"
-        },
-        {
-          "name": "Boost_SYSTEM_LIBRARY_DEBUG",
-          "value": "C:\\libs\\boost_1_66_0\\lib64-msvc-14.1\\boost_system-vc141-mt-gd-x64-1_66.lib"
-        },
-        {
-          "name": "Boost_REGEX_LIBRARY_DEBUG",
-          "value": "C:\\libs\\boost_1_66_0\\lib64-msvc-14.1\\boost_regex-vc141-mt-gd-x64-1_66.lib"
-        },
-        {
-          "name": "NOGUI",
-          "value": "false"
-        },
-        {
-          "name": "BOOST_ROOT",
-          "value": "C:\\libs\\boost_1_66_0"
-        },
-        {
-          "name": "BOOST_LIBRARYDIR",
-          "value": "C:\\libs\\boost_1_66_0\\lib64-msvc-14.1"
-        },
-        {
-          "name": "BOOST_INCLUDEDIR",
-          "value": "C:\\libs\\boost_1_66_0"
-        },
-        {
-          "name": "ZLIB_LIBRARY_DEBUG",
-          "value": "C:\\libs\\zlib-1.2.8\\build\\x64-Debug\\Debug\\zlibstaticd.lib"
-        },
-        {
-          "name": "ZLIB_INCLUDE_DIR",
-          "value": "C:\\libs\\zlib-1.2.8"
-        },
-        {
-          "name": "Qt5Widgets_DIR",
-          "value": "C:\\Qt\\5.9.5\\msvc2017_64\\lib\\cmake\\Qt5Widgets"
-        }
-      ]
-```
+`ctool1cd.exe` и `testproject.exe` лежат в `build-console\bin\Release\`.
 
 ## WebAssembly (браузерный просмотр таблиц)
 
-### Что нужно для сборки
+Команды рассчитаны на bash: Linux, macOS, WSL или Git Bash. `em++` должен быть в `PATH` в той же сессии, где запускается сборка.
 
-1. Активированный Emscripten (`em++` в `PATH`)
-2. Boost, собранный под target Emscripten (нужны `filesystem`, `system`, `regex`)
+### Emscripten
 
+```sh
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install latest
 ./emsdk activate latest
 source ./emsdk_env.sh
+```
 
-curl -L -o  boost1.88.tar.gz
-tar xf boost1.88.tar.gz
-cd boost1.88
+В новом терминале снова выполните `source /path/to/emsdk/emsdk_env.sh`.
+
+### Boost для Emscripten
+
+Скрипту `web/build-wasm.sh` нужны статические `filesystem`, `system` и `regex`. Заголовки `uuid`, `crc` и `algorithm` приезжают с исходниками Boost. Отдельный zlib не нужен: скрипт включает его флагом `-sUSE_ZLIB=1`.
+
+```sh
+curl -L -o boost_1_88_0.tar.gz https://archives.boost.org/release/1.88.0/source/boost_1_88_0.tar.gz
+tar xf boost_1_88_0.tar.gz
+cd boost_1_88_0
 
 ./bootstrap.sh
 cat > user-config.jam <<'EOF'
@@ -313,12 +184,17 @@ mkdir -p "$BOOST_WASM_ROOT"
   --with-system --with-filesystem --with-regex \
   cxxflags="-O3" \
   install --prefix="$BOOST_WASM_ROOT"
-  
+```
+
+`threading=single` оставляет имена библиотек без суффикса (`libboost_filesystem.a`), на них рассчитан скрипт.
+
 ### Сборка WASM
 
 ```sh
-BOOST_WASM_ROOT=/path/to/boost-wasm ./web/build-wasm.sh
+source /path/to/emsdk/emsdk_env.sh
+BOOST_WASM_ROOT="$HOME/opt/boost-wasm" ./web/build-wasm.sh
 ```
+
 После успешной сборки появятся:
 
 - `web/parser.js`
